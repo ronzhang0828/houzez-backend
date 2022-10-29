@@ -1,6 +1,7 @@
 FROM openjdk:11 AS build
 WORKDIR /workspace/app
 COPY . /workspace/app
+RUN microdnf install findutils
 RUN chmod +x ./gradlew
 RUN ./gradlew clean build
 
