@@ -1,4 +1,5 @@
 pipeline {
+
     agent any
     
     environment {
@@ -7,7 +8,7 @@ pipeline {
         AWS_DEFAULT_REGION='ap-southeast-2'
         IMAGE_REPO_NAME='houzez-app'
         IMAGE_TAG='latest'
-        AWS_CREDENTIAL = credentials('')
+        AWS_CREDENTIAL = credentials('houzez_app')
     }
     stages {
         stage("building image") {
