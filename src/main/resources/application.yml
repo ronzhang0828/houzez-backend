@@ -5,9 +5,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5477/postgres
+    url: jdbc:postgresql://houzez-app-database.cqpgagsfsvqr.ap-southeast-2.rds.amazonaws.com:5432/postgres
     username: postgres
-    password: admin
+    password: admin123456
 
   jpa:
     database: postgresql
@@ -23,7 +23,7 @@ system-param:
   aws-active: false
   aws-access-key: AKIAULAR7BW
   aws-secret-key: rvHELsfbo4xAWnlGRXoCs4ly/c9F
-  sender-email: zhiyu_zhao7@163.com
+  sender-email: runqingz1118@outlook.com
   base-url: http://localhost:8080/api/v1
   sign-in-jwt-expired-minute: 3600
 cors:

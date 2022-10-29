@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+    
+    environment {
+        CI = 'true'
+        AWS_ACCOUNT_ID=''
+        AWS_DEFAULT_REGION='ap-southeast-2'
+        IMAGE_REPO_NAME='oap-backend'
+        IMAGE_TAG='latest'
+        AWS_CREDENTIAL = credentials('')
+    }
+    stages {
+        stage("building image") {
+            steps {
+                echo 'docker building images'
+                sh 'aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com'
+                sh 'docker build -t ${IMAGE_REPO_NAME}:$BUILD_NUMBER .'
+            }
+        }
+        stage('Pushing to ECR') {
+            steps {
+                echo 'pushing image to ECR......'
+                sh 'docker tag ${IMAGE_REPO_NAME}:$BUILD_NUMBER ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'
+                sh 'docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'
+            }
+        }
+        stage('Deploying to ECS') {
+            steps {
+                echo 'Deploying to ECS......'
+                sh 'aws ecs update-service --cluster sigma_ecs_cluster --service sigma_ecs_svc --force-new-deployment'
+            }
+        }
+        stage('docker cleanup') {
+            steps {
+                sh 'docker image ls'
+                sh 'docker container prune --force --filter "until=2h"'
+                sh 'docker image prune --force --filter "until=1h"'
+                sh 'docker volume prune --force'
+                sh 'docker image ls'
+            }
+        }
+    }
+}
