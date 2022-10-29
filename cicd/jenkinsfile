@@ -3,9 +3,9 @@ pipeline {
     
     environment {
         CI = 'true'
-        AWS_ACCOUNT_ID=''
+        AWS_ACCOUNT_ID='541730394177'
         AWS_DEFAULT_REGION='ap-southeast-2'
-        IMAGE_REPO_NAME='oap-backend'
+        IMAGE_REPO_NAME='houzez-app'
         IMAGE_TAG='latest'
         AWS_CREDENTIAL = credentials('')
     }
@@ -24,12 +24,12 @@ pipeline {
                 sh 'docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'
             }
         }
-        stage('Deploying to ECS') {
-            steps {
-                echo 'Deploying to ECS......'
-                sh 'aws ecs update-service --cluster sigma_ecs_cluster --service sigma_ecs_svc --force-new-deployment'
-            }
-        }
+        // stage('Deploying to ECS') {
+        //     steps {
+        //         echo 'Deploying to ECS......'
+        //         sh 'aws ecs update-service --cluster sigma_ecs_cluster --service sigma_ecs_svc --force-new-deployment'
+        //     }
+        // }
         stage('docker cleanup') {
             steps {
                 sh 'docker image ls'
