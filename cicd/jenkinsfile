@@ -25,12 +25,12 @@ pipeline {
                 sh 'docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}:$IMAGE_TAG'
             }
         }
-        // stage('Deploying to ECS') {
-        //     steps {
-        //         echo 'Deploying to ECS......'
-        //         sh 'aws ecs update-service --cluster houzez_ecs_cluster --service houzez_ecs_svc --force-new-deployment'
-        //     }
-        // }
+        stage('Deploying to ECS') {
+            steps {
+                echo 'Deploying to ECS......'
+                sh 'aws ecs update-service --cluster houzez_ecs_cluster --service houzez_ecs_svc --force-new-deployment'
+            }
+        }
         stage('docker cleanup') {
             steps {
                 sh 'docker image ls'
