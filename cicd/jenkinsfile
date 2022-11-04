@@ -28,7 +28,7 @@ pipeline {
         // stage('Deploying to ECS') {
         //     steps {
         //         echo 'Deploying to ECS......'
-        //         sh 'aws ecs update-service --cluster sigma_ecs_cluster --service sigma_ecs_svc --force-new-deployment'
+        //         sh 'aws ecs update-service --cluster houzez_ecs_cluster --service houzez_ecs_svc --force-new-deployment'
         //     }
         // }
         stage('docker cleanup') {
