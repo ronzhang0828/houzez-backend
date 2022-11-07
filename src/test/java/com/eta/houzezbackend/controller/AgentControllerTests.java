@@ -1,8 +1,13 @@
 package com.eta.houzezbackend.controller;
 
 import com.eta.houzezbackend.dto.AgentSignUpDto;
+import com.eta.houzezbackend.dto.PropertyPostDto;
+import com.eta.houzezbackend.mapper.AgentMapper;
+import com.eta.houzezbackend.model.Agent;
 import com.eta.houzezbackend.repository.AgentRepository;
+import com.eta.houzezbackend.repository.PropertyRepository;
 import com.eta.houzezbackend.service.JwtService;
+import com.eta.houzezbackend.util.PropertyType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +25,16 @@ class AgentControllerTests extends ControllerIntTest {
     @Autowired
     private JwtService jwtService;
 
-    private Long mockUserId;
+
+    @Autowired
+    private AgentRepository agentRepository;
+    @Autowired
+    private AgentMapper agentMapper;
+
+    private PropertyPostDto mockPropertyCreateDto;
+    private Agent mockAgent;
+    private long mockAgentId;
+    private long mockUserId;
 
     private String mockUserEmail;
 
@@ -28,12 +42,8 @@ class AgentControllerTests extends ControllerIntTest {
 
     private String mockFakeJwt;
 
-    @Autowired
-    private AgentRepository agentRepository;
-
     @BeforeEach
     void signUp() {
-
         agentRepository.deleteAll();
         agentRepository.flush();
         mockUserId = agentController.signUp(AgentSignUpDto.builder().email("test3@gmail.com")
@@ -44,6 +54,24 @@ class AgentControllerTests extends ControllerIntTest {
         mockJwt = jwtService.createJWT(String.valueOf(mockUserId), mockUserName, 80000);
         mockFakeJwt = jwtService.createJWT(String.valueOf(mockUserId), mockUserName, -80000);
 
+        mockAgent = agentMapper.agentGetDtoToAgent(agentController.signUp(AgentSignUpDto.builder()
+                .email("test2@gmail.com")
+                .password("123qqqqq.")
+                .build()));
+        mockAgent.setActivated(true);
+        mockAgentId = mockAgent.getId();
+        mockPropertyCreateDto = PropertyPostDto.builder()
+                .garage(1).
+                propertyType(PropertyType.HOUSE)
+                .description("Mount house")
+                .title("HOUSE with sea view")
+                .preowned(false)
+                .price(800000)
+                .livingRoom(2)
+                .bedroom(4).bathroom(3)
+                .landSize(200).state("Tas")
+                .suburb("Kingston").postcode(7010).build();
+
     }
 
     @Test
@@ -51,8 +79,8 @@ class AgentControllerTests extends ControllerIntTest {
         AgentSignUpDto agentSignUpDto = AgentSignUpDto.builder().email("test4@gmail.com").password("123qqqqq.").build();
 
         mockMvc.perform(post("/agents")
-                        .content(objectMapper.writeValueAsString(agentSignUpDto))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(agentSignUpDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").value("test4@gmail.com"));
     }
@@ -84,6 +112,15 @@ class AgentControllerTests extends ControllerIntTest {
     }
 
     @Test
+    void shouldReturn201AndPropertyCreateDtoWhenPropertyIsCreated() throws Exception {
+        mockMvc.perform(post("/agents/" + mockAgentId + "/properties")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockPropertyCreateDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title").value("HOUSE with sea view"));
+    }
+
+    @Test
     void shouldReturn401WhenSetAgentToActive() throws Exception {
         mockMvc.perform(patch("/agents/" + mockUserId + "?token=" + mockFakeJwt))
                 .andExpect(status().isUnauthorized());
@@ -97,12 +134,12 @@ class AgentControllerTests extends ControllerIntTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
+
     @Test
-    void shouldReturn400WhenForgetPasswordEmailSentFailed() throws Exception{
+    void shouldReturn400WhenForgetPasswordEmailSentFailed() throws Exception {
         mockMvc.perform(post("/agents/forget-password")
                         .content("{\"email\":\"hagent002@gmail.com\"}")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
-    
 }

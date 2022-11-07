@@ -73,7 +73,6 @@ public class AgentServiceTest {
     @Test
     void shouldSaveNewAgentInAgentRepoWhenSignUpNewAgent() {
 
-
         when(agentMapper.agentSignUpDtoToAgent(mockAgentSignUpDto)).thenReturn(mockAgent);
         when(agentRepository.save(mockAgent)).thenReturn(mockAgent);
         when(agentMapper.agentToAgentGetDto(mockAgent)).thenReturn(mockAgentGetDto);
@@ -126,7 +125,7 @@ public class AgentServiceTest {
         String mockEmail = "test2@gmail.com";
         when(agentRepository.findByEmail(mockEmail)).thenReturn(Optional.of(mockAgent));
         assertEquals(agentService.findByEmail(mockEmail), mockAgent);
-        lenient().when(jwtService.createResetPasswordJWT(10,mockAgent.getEmail())).thenReturn("jwt");
+        lenient().when(jwtService.createResetPasswordJWT(10, mockAgent.getEmail())).thenReturn("jwt");
         lenient().when(systemParam.getBaseUrl()).thenReturn("http://localhost:8080/api/v1");
         String resetLink = "http://localhost:8080/api/v1" + "/reset-password?code=" + "jwt";
         lenient().doNothing().when(emailService).sendEmail(mockAgent.getEmail(), resetLink, "forgetPassword");
