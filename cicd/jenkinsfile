@@ -6,6 +6,8 @@ pipeline {
         CI = 'true'
         AWS_ACCOUNT_ID='541730394177'
         AWS_DEFAULT_REGION='ap-southeast-2'
+        CLUSTER_NAME='houzez_backend_cluster'
+        SERVICE_NAME='houzez_ecs_service'
         IMAGE_REPO_NAME='houzez-app'
         IMAGE_TAG='latest'
         AWS_CREDENTIAL = credentials('houzez_app')
@@ -28,8 +30,7 @@ pipeline {
         stage('Deploying to ECS') {
             steps {
                 echo 'Deploying to ECS......'
-                // sh 'aws ecs update-service --cluster ron-houzez-cluster-ecs --service ron-houzez-ecs-service --force-new-deployment'
-                sh 'aws ecs create-service --cluster ron-houzez-cluster-ecs --service-name ron-houzez-ecs-service --task-definition houzez-backend-task --desired-count 1 --launch-type "FARGATE" --network-configuration "awsvpcConfiguration={subnets=[subnet-077c9758],securityGroups=[sg-e29b36ce],assignPublicIp=ENABLED}" '
+                sh 'aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment'
             }
         }
         stage('docker cleanup') {
