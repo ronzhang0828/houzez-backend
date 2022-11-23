@@ -1,5 +1,6 @@
 package com.eta.houzezbackend.service;
 
+import com.eta.houzezbackend.dto.PropertyPaginationGetDto;
 import com.eta.houzezbackend.dto.PropertyPostDto;
 import com.eta.houzezbackend.dto.PropertyGetDto;
 import com.eta.houzezbackend.exception.ResourceNotFoundException;
@@ -25,7 +26,6 @@ public class PropertyService {
     private final PropertyMapper propertyMapper;
     private final AgentService agentService;
 
-
     public PropertyGetDto createNewProperty(PropertyPostDto propertyCreateDto, long agentId) {
         Property property = propertyMapper.propertyCreateDtoToProperty(propertyCreateDto);
         Agent agent = agentService.find(agentId);
@@ -41,11 +41,26 @@ public class PropertyService {
     }
 
     @Transactional
-    public List<PropertyGetDto> getPropertiesByAgent(long id, int page, int size) {
+    public PropertyPaginationGetDto getPropertiesByAgent(long id, int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         Page<Property> properties = propertyRepository.findByAgent_Id(id, paging);
-        return properties.getContent().stream()
+        return this.getPagination(properties);
+    }
+
+    @Transactional
+    public PropertyPaginationGetDto getAllProperty(int page, int size) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Property> properties = propertyRepository.findAll(paging);
+        return this.getPagination(properties);
+    }
+
+    private PropertyPaginationGetDto getPagination(Page<Property> properties){
+        List<PropertyGetDto> propertiesGetDto = properties.getContent().stream()
                 .map(propertyMapper::propertyToPropertyGetDto)
                 .collect(Collectors.toList());
+
+        return PropertyPaginationGetDto.builder().propertyGetDtoList(propertiesGetDto)
+                .totalPageNumber(properties.getTotalPages()).build();
     }
+
 }

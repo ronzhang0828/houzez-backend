@@ -4,6 +4,7 @@ import com.eta.houzezbackend.util.PropertyType;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,6 +25,7 @@ public class PropertyGetDto {
     private int landSize;
     private String description;
     private String state;
+    private String street;
     private String suburb;
     private int postcode;
     private Double latitude;
@@ -35,5 +37,5 @@ public class PropertyGetDto {
     private Date createdTime;
     private Date updatedTime;
     private AgentGetDto agent;
-
+    private List<ImageGetDto> image;
 }
